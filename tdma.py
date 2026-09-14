@@ -31,7 +31,7 @@ def TDMA(A, b):
 
     x[n-1] = (u[n-1] - v[n-1] * u[n-2]) / (1 - v[n-1] * v[n-2])
 
-    for i in range(3, -1, -1):
+    for i in range(n-2, -1, -1):
         x[i] = u[i] - v[i] * x[i + 1]
 
     return x
