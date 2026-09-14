@@ -34,6 +34,4 @@ def TDMA(A, b):
     for i in range(3, -1, -1):
         x[i] = u[i] - v[i] * x[i + 1]
 
-    print(x)
-
-TDMA(A, b)
+    return x
