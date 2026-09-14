@@ -1,6 +1,6 @@
 from tdma import TDMA
-
 import numpy as np
+import matplotlib.pyplot as plt
 
 k = 1000
 deltax = 0.1
@@ -34,4 +34,22 @@ b[0] = Su_A
 
 b[-1] = Su_B
 
-print(f'T = {TDMA(A, b)}')
+T = TDMA(A, b)
+
+print(f'T = {T}')
+
+# Posiciones de los nodos (centro de cada volumen de control)
+x_nodos = np.array([deltax/2 + i*deltax for i in range(5)])
+
+# Solución analítica (recta entre T_A y T_B)
+x_analitica = np.array([0, 0.5])
+T_analitica = np.array([TA, TB])
+
+plt.plot(x_analitica, T_analitica, '--', label='Solución analítica')
+plt.plot(x_nodos, T, 'o', label='TDMA (volúmenes finitos)')
+plt.xlabel('x (m)')
+plt.ylabel('Temperatura (°C)')
+plt.title('Ejemplo 4.1 — Difusión 1D en estado estacionario')
+plt.legend()
+plt.grid(True)
+plt.show()
