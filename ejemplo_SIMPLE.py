@@ -12,7 +12,7 @@ rhoA = 1.0
 rhoB = 1.0 
 muA = 1.0
 muB = 1.0
-Su = 0
+Su = 0.0
 
 i = np.arange(n)
 
@@ -26,25 +26,26 @@ p = np.full(n, pB)
 u = np.full(n, uA)
 
 rho = np.full(n, rhoA)
+rho_ext = np.append(rho, rhoB)
+rhou = (rho_ext[0:n] + rho_ext[1:n+1]) / 2
 mu = np.full(n, muA)
-
-FW = np.zeros(n)
-FE = np.zeros(n)
-
-Sp = np.zeros(n)
-
-b = np.zeros(n)
 
 DW = mu * AP / deltax 
 DE = np.zeros(n)
 DE[0:n-1] = mu[1:n] * AP[1:n] / deltax
-DE[n-1] = 0 #
+DE[n-1] = 0 
 
 p_corr = 0.5
 index = 0
 tol = 1e-6
+max_iter = 1000
 
-while np.max(np.abs(p_corr)) > tol and index < 100000:
+while np.max(np.abs(p_corr)) > tol and index < max_iter:
+
+    FW = np.zeros(n)
+    FE = np.zeros(n)
+    Sp = np.zeros(n)
+    b = np.zeros(n)
 
     for k in range(n):
 
@@ -54,7 +55,7 @@ while np.max(np.abs(p_corr)) > tol and index < 100000:
             FW[k] = rho[k] * AP[k] * (u[k] + u[k-1]) / 2
             
         if k == n-1:
-            r =  (rhoB + rho[k]) / 2 * Au[k] / rhoB / AB
+            r =  rhou[k] * Au[k] / rhoB / AB
             FB = rhoB * AB * r * u[k] 
             Sp[k] = - FB * r
         else: 
@@ -84,18 +85,15 @@ while np.max(np.abs(p_corr)) > tol and index < 100000:
 
     u_star = TDMA(A, b)
 
-    ########## Coeficientes de presión ##########
+    # ---- Coeficientes de presión  ----
 
     aEp = np.zeros(n)
     aWp = np.zeros(n)
     bp = np.zeros(n)
-    rhou = np.zeros(n)
     Spp = np.zeros(n)
     d = Au / aP
 
     for k in range(n):
-
-        rhou[k] = (rhoB + rho[k]) / 2 if k == n-1 else (rho[k+1] + rho[k]) / 2
 
         aEp[k] = 0 if k == n-1 else rhou[k] * d[k] * Au[k]
 
@@ -129,5 +127,5 @@ while np.max(np.abs(p_corr)) > tol and index < 100000:
 
 print(u)
 print(p)
-print(index)
+print(f'Finaliza en la iteración {index} de {max_iter}')
 
