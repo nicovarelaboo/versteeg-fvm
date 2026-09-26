@@ -2,7 +2,7 @@ import numpy as np
 from tdma import TDMA
 
 L = 1
-n = 4
+n = 100
 deltax = L / (n + 1/2)
 AA = 0.5
 AB = 0.1
@@ -13,6 +13,8 @@ rhoB = 1.0
 muA = 1.0
 muB = 1.0
 Su = 0.0
+alphau = 0.8
+alphap = 0.2
 
 i = np.arange(n)
 
@@ -39,6 +41,7 @@ p_corr = 0.5
 index = 0
 tol = 1e-6
 max_iter = 1000
+
 
 while np.max(np.abs(p_corr)) > tol and index < max_iter:
 
@@ -76,6 +79,10 @@ while np.max(np.abs(p_corr)) > tol and index < max_iter:
     aE[n-1] = 0
     aP = aW + aE + (FE - FW) - Sp 
 
+    # Subrelajación de las velocidades
+    aP = aP / alphau
+    b = b + aP * (1-alphau) * u
+
     A = np.zeros((n,n))
 
     for k in range(n):
@@ -91,7 +98,7 @@ while np.max(np.abs(p_corr)) > tol and index < max_iter:
     aWp = np.zeros(n)
     bp = np.zeros(n)
     Spp = np.zeros(n)
-    d = Au / aP
+    d = Au / aP 
 
     for k in range(n):
 
@@ -121,7 +128,8 @@ while np.max(np.abs(p_corr)) > tol and index < max_iter:
 
     u = u_star + d * (p_corr_ext[0:n] - p_corr_ext[1:n+1]) 
         
-    p = p + 0.3 * p_corr
+    #Subrelajación de las presiones 
+    p = p + alphap * p_corr
 
     index += 1
 
