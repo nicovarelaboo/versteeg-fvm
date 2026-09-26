@@ -1,139 +1,135 @@
 import numpy as np
 from tdma import TDMA
 
-L = 1
-n = 100
-deltax = L / (n + 1/2)
-AA = 0.5
-AB = 0.1
-pB = 1.0
-uA = 1.0
-rhoA = 1.0
-rhoB = 1.0 
-muA = 1.0
-muB = 1.0
-Su = 0.0
-alphau = 0.8
-alphap = 0.2
+def tobera1D(n=100, alphap=0.2, alphau=0.8, max_iter=1_000, tol=1e-6):
 
-i = np.arange(n)
+    L = 1
+    deltax = L / (n + 1/2)
+    AA = 0.5
+    AB = 0.1
+    pB = 1.0
+    uA = 1.0
+    rhoA = 1.0
+    rhoB = 1.0
+    muA = 1.0
+    muB = 1.0
+    Su = 0.0
 
-xu = deltax + deltax * i
-xP = deltax / 2 + deltax * i
+    i = np.arange(n)
 
-Au = AA - (AA - AB) / L * xu 
-AP = AA - (AA - AB) / L * xP
+    xu = deltax + deltax * i
+    xP = deltax / 2 + deltax * i
 
-p = np.full(n, pB)
-u = np.full(n, uA)
+    Au = AA - (AA - AB) / L * xu
+    AP = AA - (AA - AB) / L * xP
 
-rho = np.full(n, rhoA)
-rho_ext = np.append(rho, rhoB)
-rhou = (rho_ext[0:n] + rho_ext[1:n+1]) / 2
-mu = np.full(n, muA)
+    p = np.full(n, pB)
+    u = np.full(n, uA)
 
-DW = mu * AP / deltax 
-DE = np.zeros(n)
-DE[0:n-1] = mu[1:n] * AP[1:n] / deltax
-DE[n-1] = 0 
+    rho = np.full(n, rhoA)
+    rho_ext = np.append(rho, rhoB)
+    rhou = (rho_ext[0:n] + rho_ext[1:n+1]) / 2
+    mu = np.full(n, muA)
 
-p_corr = 0.5
-index = 0
-tol = 1e-6
-max_iter = 1000
+    DW = mu * AP / deltax
+    DE = np.zeros(n)
+    DE[0:n-1] = mu[1:n] * AP[1:n] / deltax
+    DE[n-1] = 0
 
+    p_corr = 0.5
+    index = 0
 
-while np.max(np.abs(p_corr)) > tol and index < max_iter:
+    while np.max(np.abs(p_corr)) > tol and index < max_iter:
 
-    FW = np.zeros(n)
-    FE = np.zeros(n)
-    Sp = np.zeros(n)
-    b = np.zeros(n)
+        FW = np.zeros(n)
+        FE = np.zeros(n)
+        Sp = np.zeros(n)
+        b = np.zeros(n)
 
-    for k in range(n):
+        for k in range(n):
 
-        if k == 0:
-            FW[k] = rho[k] * AP[k] * (u[k] + uA) / 2 
-        else:
-            FW[k] = rho[k] * AP[k] * (u[k] + u[k-1]) / 2
-            
-        if k == n-1:
-            r =  rhou[k] * Au[k] / rhoB / AB
-            FB = rhoB * AB * r * u[k] 
-            Sp[k] = - FB * r
-        else: 
-            FE[k] = rho[k+1] * AP[k+1] * (u[k+1] + u[k]) / 2
+            if k == 0:
+                FW[k] = rho[k] * AP[k] * (u[k] + uA) / 2
+            else:
+                FW[k] = rho[k] * AP[k] * (u[k] + u[k-1]) / 2
+            if k == n-1:
+                r = rhou[k] * Au[k] / rhoB / AB
+                FB = rhoB * AB * r * u[k]
+                Sp[k] = - FB * r
+            else:
+                FE[k] = rho[k+1] * AP[k+1] * (u[k+1] + u[k]) / 2
 
-        if k == n-1:
-            b[k] = -(pB - p[k]) * Au[k] + Su *Au[k] * deltax + muB * AB * (r-1) * u[k] / (deltax/2)
-        elif k == 0:
-            b[k] = (1/2 * FW[0] + DW[0]) * uA - (p[1] - p[0]) * Au[0] + Su * Au[0] * deltax
-        else:
-            b[k] = -(p[k+1] - p[k]) * Au[k] + Su * Au[k] * deltax
-        
-    Sp[0] = - (DW[0] + 1/2 * FW[0])
+            if k == n-1:
+                b[k] = -(pB - p[k]) * Au[k] + Su * Au[k] * deltax + muB * AB * (r-1) * u[k] / (deltax/2)
+            elif k == 0:
+                b[k] = (1/2 * FW[0] + DW[0]) * uA - (p[1] - p[0]) * Au[0] + Su * Au[0] * deltax
+            else:
+                b[k] = -(p[k+1] - p[k]) * Au[k] + Su * Au[k] * deltax
 
-    aW = DW + 1 / 2 * FW
-    aW[0] = 0
-    aE = DE - 1 / 2 * FE 
-    aE[n-1] = 0
-    aP = aW + aE + (FE - FW) - Sp 
+        Sp[0] = - (DW[0] + 1/2 * FW[0])
 
-    # Subrelajación de las velocidades
-    aP = aP / alphau
-    b = b + aP * (1-alphau) * u
+        aW = DW + 1 / 2 * FW
+        aW[0] = 0
+        aE = DE - 1 / 2 * FE
+        aE[n-1] = 0
+        aP = aW + aE + (FE - FW) - Sp
 
-    A = np.zeros((n,n))
+        # Subrelajación de las velocidades
+        aP = aP / alphau
+        b = b + aP * (1-alphau) * u
 
-    for k in range(n):
-        A[k,k] = aP[k]
-        if k-1 >= 0: A[k, k-1] = - aW[k]
-        if k+1 < n: A[k, k+1] = - aE[k]
+        A = np.zeros((n,n))
 
-    u_star = TDMA(A, b)
+        for k in range(n):
+            A[k,k] = aP[k]
+            if k-1 >= 0: A[k, k-1] = - aW[k]
+            if k+1 < n: A[k, k+1] = - aE[k]
 
-    # ---- Coeficientes de presión  ----
+        u_star = TDMA(A, b)
 
-    aEp = np.zeros(n)
-    aWp = np.zeros(n)
-    bp = np.zeros(n)
-    Spp = np.zeros(n)
-    d = Au / aP 
+        # ---- Coeficientes de presión ----
 
-    for k in range(n):
+        aEp = np.zeros(n)
+        aWp = np.zeros(n)
+        bp = np.zeros(n)
+        Spp = np.zeros(n)
+        d = Au / aP
 
-        aEp[k] = 0 if k == n-1 else rhou[k] * d[k] * Au[k]
+        for k in range(n):
 
-        aWp[k] = 0 if k == 0 else rhou[k-1] * Au[k-1] * d[k-1]
-        
-        if k == 0:
-            bp[k] = rhoA * uA * AA - rhou[k] * u_star[k] * Au[k]
-        else:
-            bp[k] = rhou[k-1] * u_star[k-1] * Au[k-1] - rhou[k] * u_star[k] * Au[k]
+            aEp[k] = 0 if k == n-1 else rhou[k] * d[k] * Au[k]
 
-        Spp[k] = - rhou[k] * Au[k] * d[k] if k == n-1 else 0
+            aWp[k] = 0 if k == 0 else rhou[k-1] * Au[k-1] * d[k-1]
+            if k == 0:
+                bp[k] = rhoA * uA * AA - rhou[k] * u_star[k] * Au[k]
+            else:
+                bp[k] = rhou[k-1] * u_star[k-1] * Au[k-1] - rhou[k] * u_star[k] * Au[k]
 
-    aPp = aEp + aWp - Spp
+            Spp[k] = - rhou[k] * Au[k] * d[k] if k == n-1 else 0
 
-    Mp = np.zeros((n,n))
+        aPp = aEp + aWp - Spp
 
-    for k in range(n):
-        Mp[k,k] = aPp[k]
-        if k-1 >= 0: Mp[k, k-1] = - aWp[k]
-        if k+1 < n: Mp[k, k+1] = - aEp[k]
+        Mp = np.zeros((n,n))
 
-    p_corr = TDMA(Mp, bp)
+        for k in range(n):
+            Mp[k,k] = aPp[k]
+            if k-1 >= 0: Mp[k, k-1] = - aWp[k]
+            if k+1 < n: Mp[k, k+1] = - aEp[k]
 
-    p_corr_ext = np.append(p_corr, 0)
+        p_corr = TDMA(Mp, bp)
 
-    u = u_star + d * (p_corr_ext[0:n] - p_corr_ext[1:n+1]) 
-        
-    #Subrelajación de las presiones 
-    p = p + alphap * p_corr
+        p_corr_ext = np.append(p_corr, 0)
 
-    index += 1
+        u = u_star + d * (p_corr_ext[0:n] - p_corr_ext[1:n+1])
+        # Subrelajación de las presiones
+        p = p + alphap * p_corr
 
-print(u)
-print(p)
-print(f'Finaliza en la iteración {index} de {max_iter}')
+        index += 1
 
+    return u, p, index
+
+if __name__ == "__main__":
+    u, p, index = tobera1D()
+    print(f'u = {u}')
+    print(f'p = {p}')
+    print(f"Finaliza en la iteración {index}")
