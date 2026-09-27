@@ -39,6 +39,8 @@ def tobera1D(n=100, alphap=0.2, alphau=0.8, max_iter=1_000, tol=1e-6):
     p_corr = 0.5
     index = 0
 
+    res_masa = []
+
     while np.max(np.abs(p_corr)) > tol and index < max_iter:
 
         FW = np.zeros(n)
@@ -124,12 +126,22 @@ def tobera1D(n=100, alphap=0.2, alphau=0.8, max_iter=1_000, tol=1e-6):
         # Subrelajación de las presiones
         p = p + alphap * p_corr
 
+        res_masa.append(np.sum(np.abs(bp)))
+
         index += 1
 
-    return u, p, index
+    if not np.all(np.isfinite(u)) or not np.all(np.isfinite(p)):
+        print('Diverge')
+        break
+
+    res_masa = np.array(res_masa) / (rhoA * uA* AA)
+
+    return u, p, index, res_masa
 
 if __name__ == "__main__":
-    u, p, index = tobera1D()
+    u, p, index, res_masa = tobera1D()
     print(f'u = {u}')
     print(f'p = {p}')
     print(f"Finaliza en la iteración {index}")
+
+
