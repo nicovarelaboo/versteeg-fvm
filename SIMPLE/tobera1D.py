@@ -147,14 +147,15 @@ def tobera1D(n=100, alphap=0.2, alphau=0.8, max_iter=1_000, tol=1e-6):
         "residuos de masa" : res_masa,
         "estado de convergencia": estado,
         "xu" : xu, 
-        "xP" : xP
+        "xP" : xP,
+        "alphap" : alphap,
+        "alphau" : alphau
     }
 
     return resultado
 
 if __name__ == "__main__":
     resultado = tobera1D()
-    print(resultado["estado de convergencia"])
+    print(f'Con alphap = {resultado["alphap"]} y alphau = {resultado["alphau"]} {resultado["estado de convergencia"]}')
     print(f"Finaliza en la iteración {resultado["índice"]}")
-
 
