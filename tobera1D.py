@@ -140,11 +140,21 @@ def tobera1D(n=100, alphap=0.2, alphau=0.8, max_iter=1_000, tol=1e-6):
 
     res_masa = np.array(res_masa) / (rhoA * uA* AA)
 
-    return u, p, index, res_masa, estado
+    resultado = {
+        "u" : u,
+        "p" : p,
+        "índice" : index,
+        "residuos de masa" : res_masa,
+        "estado de convergencia": estado,
+        "xu" : xu, 
+        "xP" : xP
+    }
+
+    return resultado
 
 if __name__ == "__main__":
-    u, p, index, res_masa, estado = tobera1D()
-    print(estado)
-    print(f"Finaliza en la iteración {index}")
+    resultado = tobera1D()
+    print(resultado["estado de convergencia"])
+    print(f"Finaliza en la iteración {resultado["índice"]}")
 
 
