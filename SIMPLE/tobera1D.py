@@ -1,6 +1,14 @@
 import numpy as np
 from tdma import TDMA
 
+def solucion_exacta(x, L=1.0, AA=0.5, AB=0.1, uA=1.0, pB=1.0, rho=1.0, mu=1.0):
+    dA = -(AA - AB) / L          # A' (constante)
+    A = AA + dA * x              # área en x
+    Q = rho * uA * AA            # caudal másico
+    u = Q / (rho * A)
+    p = pB + Q / (2 * rho) * (Q + mu * dA) * (1 / AB**2 - 1 / A**2)
+    return u, p
+
 def tobera1D(n=100, alphap=0.2, alphau=0.8, max_iter=1_000, tol=1e-6):
 
     L = 1
@@ -149,7 +157,8 @@ def tobera1D(n=100, alphap=0.2, alphau=0.8, max_iter=1_000, tol=1e-6):
         "xu" : xu, 
         "xP" : xP,
         "alphap" : alphap,
-        "alphau" : alphau
+        "alphau" : alphau,
+        "L" : L,
     }
 
     return resultado
