@@ -41,6 +41,8 @@ def tobera1D(n=100, alphap=0.2, alphau=0.8, max_iter=1_000, tol=1e-6):
 
     res_masa = []
 
+    divergido = False 
+
     while np.max(np.abs(p_corr)) > tol and index < max_iter:
 
         FW = np.zeros(n)
@@ -130,18 +132,19 @@ def tobera1D(n=100, alphap=0.2, alphau=0.8, max_iter=1_000, tol=1e-6):
 
         index += 1
 
-    if not np.all(np.isfinite(u)) or not np.all(np.isfinite(p)):
-        print('Diverge')
-        break
+        if not np.all(np.isfinite(u)) or not np.all(np.isfinite(p)):
+            divergido = True
+            break
+
+    estado = "divergió" if divergido else "se acabaron las iteraciones" if index >= max_iter else "convergió"
 
     res_masa = np.array(res_masa) / (rhoA * uA* AA)
 
-    return u, p, index, res_masa
+    return u, p, index, res_masa, estado
 
 if __name__ == "__main__":
-    u, p, index, res_masa = tobera1D()
-    print(f'u = {u}')
-    print(f'p = {p}')
+    u, p, index, res_masa, estado = tobera1D()
+    print(estado)
     print(f"Finaliza en la iteración {index}")
 
 
