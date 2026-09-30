@@ -65,9 +65,9 @@ def resolver_difusion(malla: Malla, difusividad: float | np.ndarray,
 if __name__ == "__main__":
     from fvm1d.malla import crear_malla
 
-    m = crear_malla(0.5, 5, 0.01)
-    phi = resolver_difusion(m, 1000.0,
-                            Contorno("dirichlet", 100.0),
-                            Contorno("dirichlet", 500.0))
+    m = crear_malla(L=0.5, n=5, area=0.01)
+    phi = resolver_difusion(malla=m, difusividad=1000.0,
+                            oeste=Contorno("dirichlet", 100.0),
+                            este=Contorno("dirichlet", 500.0))
     print(phi)
 
