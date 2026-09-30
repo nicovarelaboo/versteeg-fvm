@@ -5,7 +5,7 @@ class Contorno:
     tipo: str 
     valor: float
 
-def coeficientes_contorno(contorno, delta):
+def coeficientes_contorno(contorno: Contorno, delta: float) -> tuple[float, float, float, float]:
     if contorno.tipo == "dirichlet":
         phi_b = contorno.valor
         alfa = 0.0

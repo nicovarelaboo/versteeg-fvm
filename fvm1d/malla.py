@@ -13,7 +13,7 @@ class Malla:
     delta_este: float
     area: np.ndarray
 
-def crear_malla(L, n, area):
+def crear_malla(L: float, n: int, area: float | np.ndarray) -> Malla:
     caras = np.linspace(0, L, n+1)
     nodos = (caras[:-1] + caras[1:]) / 2
     dx = np.diff(caras)
