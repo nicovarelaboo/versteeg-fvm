@@ -38,8 +38,8 @@ def resolver_difusion(malla: Malla, difusividad: float | np.ndarray,
     aW, aE = coeficientes_difusion(malla, difusividad)
 
     # 1. Su y Sp: arrays de n ceros
-    Su = np.zeros(malla.n)
-    Sp = np.zeros(malla.n)
+    Su_contorno = np.zeros(malla.n)
+    Sp_contorno = np.zeros(malla.n)
 
     # 3. difusividad en las n+1 caras (np.broadcast_to), para usar
     # la de las caras de contorno, índices 0 y -1
@@ -48,19 +48,19 @@ def resolver_difusion(malla: Malla, difusividad: float | np.ndarray,
     # 4. contorno oeste: coeficientes con malla.delta_oeste, y
     _, _, gamma_oeste, kappa_oeste = coeficientes_contorno(oeste, malla.delta_oeste)
     
-    Sp[0] += difusividad[0] * malla.area[0] * gamma_oeste
-    Su[0] += difusividad[0] * malla.area[0] * kappa_oeste
+    Sp_contorno[0] += difusividad[0] * malla.area[0] * gamma_oeste
+    Su_contorno[0] += difusividad[0] * malla.area[0] * kappa_oeste
 
     # 5. contorno este: igual con malla.delta_este e índices -1
     _, _, gamma_este, kappa_este = coeficientes_contorno(este, malla.delta_este)
     
-    Sp[-1] += difusividad[-1] * malla.area[-1] * gamma_este
-    Su[-1] += difusividad[-1] * malla.area[-1] * kappa_este
+    Sp_contorno[-1] += difusividad[-1] * malla.area[-1] * gamma_este
+    Su_contorno[-1] += difusividad[-1] * malla.area[-1] * kappa_este
 
     # 6. sumar fuentes
     Su_fuentes, Sp_fuentes = integrar_fuentes(malla=malla, fuentes=fuentes)
-    Sp += Sp_fuentes
-    Su += Su_fuentes
+    Sp = Sp_contorno + Sp_fuentes
+    Su = Su_contorno + Su_fuentes
 
     # 7. aP = aW + aE - Sp
     aP = aW + aE - Sp 
