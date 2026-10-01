@@ -12,7 +12,7 @@ class Fuente:
     constante: float | np.ndarray
     lineal: float | np.ndarray  # por unidad de φ y de volumen (debe ser <= 0)
 
-def integrar_fuentes(malla: Malla, fuentes: list[Fuente]) -> tuple[np.ndarray, np.ndarray]:
+def integrar_fuentes(malla: Malla, fuentes: list[Fuente] | tuple[Fuente, ...]) -> tuple[np.ndarray, np.ndarray]:
     """
     Integra las fuentes linealizadas en el volumen de cada celda.
 
