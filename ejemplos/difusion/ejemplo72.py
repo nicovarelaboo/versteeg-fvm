@@ -1,5 +1,5 @@
 import numpy as np 
-from tdma import TDMA
+from fvm.resolvedores import TDMA
 
 np.set_printoptions(precision=3, suppress=True)
 

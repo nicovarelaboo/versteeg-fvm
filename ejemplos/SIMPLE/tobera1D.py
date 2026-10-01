@@ -1,5 +1,5 @@
 import numpy as np
-from tdma import TDMA
+from fvm.resolvedores import TDMA
 
 def solucion_exacta(x, L=1.0, AA=0.5, AB=0.1, uA=1.0, pB=1.0, rho=1.0, mu=1.0):
     dA = -(AA - AB) / L          # A' (constante)

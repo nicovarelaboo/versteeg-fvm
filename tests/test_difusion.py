@@ -1,8 +1,8 @@
 import numpy as np
 
-from fvm1d.malla import crear_malla
-from fvm1d.ensamblado import resolver_difusion
-from fvm1d.contornos import Contorno
+from fvm.malla import crear_malla
+from fvm.ensamblado import resolver_difusion
+from fvm.contornos import Contorno
 
 def prueba_flujo_este():
 

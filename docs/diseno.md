@@ -1,7 +1,20 @@
-# Diseño de fvm1d
+# Diseño de fvm
 
-Paquete de volúmenes finitos 1D para la ecuación de transporte de φ,
+Paquete de volúmenes finitos (de momento 1D) para la ecuación de transporte de φ,
 siguiendo la notación de Versteeg y Malalasekera.
+
+## Estructura del repositorio
+
+- `fvm/`: paquete reutilizable (malla, contornos, difusión, ensamblado
+  y resolvedores).
+- `ejemplos/`: ejemplos del libro, organizados por tema (`difusion`,
+  `conveccion`, `SIMPLE`, `transitorio`). Los más antiguos aún no usan
+  el paquete y se irán migrando.
+- `tests/`: pruebas contra soluciones exactas.
+- `docs/`: documentación de diseño.
+
+Todo se ejecuta como módulo desde la raíz, por ejemplo
+`python -m ejemplos.difusion.ejemplo42` o `python -m tests.test_difusion`.
 
 ## Decisiones
 
@@ -51,13 +64,13 @@ classDiagram
         <<módulo ensamblado.py>>
         +resolver_difusion(malla, difusividad, oeste, este) ndarray
     }
-    class modulo_tdma {
-        <<módulo tdma.py>>
+    class modulo_resolvedores {
+        <<módulo resolvedores.py>>
         +TDMA(A, b) ndarray
         +tdma_coeficientes(aW, aP, aE, Su) ndarray
     }
     class modulo_pruebas {
-        <<módulo pruebas_difusion.py>>
+        <<módulo tests/test_difusion.py>>
         +prueba_flujo_este() bool
         +prueba_flujo_oeste() bool
         +prueba_aislamiento_este() bool
@@ -68,7 +81,7 @@ classDiagram
     modulo_difusion ..> Malla : lee
     modulo_ensamblado ..> modulo_difusion : llama
     modulo_ensamblado ..> modulo_contornos : llama
-    modulo_ensamblado ..> modulo_tdma : llama
+    modulo_ensamblado ..> modulo_resolvedores : llama
     modulo_pruebas ..> modulo_ensamblado : valida
 ```
 

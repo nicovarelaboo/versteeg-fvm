@@ -1,6 +1,6 @@
 import numpy as np 
-from coeficientes_cds import coeficientes_cds
-from coeficientes_quick import coeficientes_quick
+from ejemplos.conveccion.coeficientes_cds import coeficientes_cds
+from ejemplos.conveccion.coeficientes_quick import coeficientes_quick
 import matplotlib.pyplot as plt
 
 u = 0.2
