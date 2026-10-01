@@ -20,7 +20,7 @@ def integrar_fuentes(malla: Malla, fuentes: list[Fuente] | tuple[Fuente, ...]) -
     ----------
     malla : Malla
         Malla 1D centrada en celdas.
-    fuentes : list[Fuente]
+    fuentes : list[Fuente] | tuple[Fuente, ...]
         Fuentes a sumar; cada campo es un valor uniforme o uno por nodo.
 
     Returns
