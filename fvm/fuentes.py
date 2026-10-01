@@ -5,10 +5,34 @@ from fvm.malla import Malla
 
 @dataclass(frozen=True)
 class Fuente:
+    """
+    Fuente linealizada por unidad de volumen: S = constante + lineal·φ.
+    """
+
     constante: float | np.ndarray
     lineal: float | np.ndarray  # por unidad de φ y de volumen (debe ser <= 0)
 
 def integrar_fuentes(malla: Malla, fuentes: list[Fuente]) -> tuple[np.ndarray, np.ndarray]:
+    """
+    Integra las fuentes linealizadas en el volumen de cada celda.
+
+    Parameters
+    ----------
+    malla : Malla
+        Malla 1D centrada en celdas.
+    fuentes : list[Fuente]
+        Fuentes a sumar; cada campo es un valor uniforme o uno por nodo.
+
+    Returns
+    -------
+    Su, Sp : ndarray
+        Aportaciones a Su y Sp en cada nodo.
+
+    Raises
+    ------
+    ValueError
+        Si algún coeficiente lineal es positivo (regla 3 de Patankar).
+    """
 
     Su = np.zeros(malla.n)
     Sp = np.zeros(malla.n)
