@@ -1,5 +1,5 @@
 import numpy as np 
-from tdma import TDMA
+from fvm.resolvedores import TDMA
 
 def conduccion_explicita_1D(n=5, deltat=2, tfinal=(10,)):
 

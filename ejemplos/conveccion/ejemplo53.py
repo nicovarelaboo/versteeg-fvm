@@ -1,9 +1,9 @@
 import numpy as np 
 import matplotlib.pyplot as plt
-from tdma import TDMA 
+from fvm.resolvedores import TDMA 
 
 L = 1
-n = 5
+n = 25
 rho = 1
 Gamma = 0.1
 deltax = L / n
@@ -18,8 +18,8 @@ F = rho * u
 A = np.zeros((n,n))
 b = np.zeros(n)
 
-aW = D + F 
-aE = D
+aW = np.max([F, D + F/2, 0]) 
+aE = np.max([-F, D - F/2, 0]) 
 
 Sp1 = - (2 * D + F) 
 Su1 = (2 * D + F) * phiA 

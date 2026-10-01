@@ -1,4 +1,4 @@
-from tdma import TDMA
+from fvm.resolvedores import TDMA
 import numpy as np
 import matplotlib.pyplot as plt
 

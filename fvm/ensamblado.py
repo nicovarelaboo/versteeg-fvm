@@ -1,9 +1,9 @@
 import numpy as np
 
-from fvm1d.contornos import coeficientes_contorno, Contorno
-from fvm1d.difusion import coeficientes_difusion
-from tdma import tdma_coeficientes
-from fvm1d.malla import Malla 
+from fvm.contornos import coeficientes_contorno, Contorno
+from fvm.difusion import coeficientes_difusion
+from fvm.resolvedores import tdma_coeficientes
+from fvm.malla import Malla 
 
 
 def resolver_difusion(malla: Malla, difusividad: float | np.ndarray,
@@ -63,7 +63,7 @@ def resolver_difusion(malla: Malla, difusividad: float | np.ndarray,
 
 
 if __name__ == "__main__":
-    from fvm1d.malla import crear_malla
+    from fvm.malla import crear_malla
 
     m = crear_malla(L=0.5, n=5, area=0.01)
     phi = resolver_difusion(malla=m, difusividad=1000.0,

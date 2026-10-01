@@ -1,6 +1,6 @@
 import numpy as np 
 import matplotlib.pyplot as plt
-from tdma import TDMA 
+from fvm.resolvedores import TDMA 
 
 L = 1
 n = 5

@@ -1,9 +1,10 @@
 import numpy as np
 import matplotlib.pyplot as plt 
-from SIMPLE.tobera1D import tobera1D, solucion_exacta
+from ejemplos.SIMPLE.tobera1D import tobera1D, solucion_exacta
 import os
 
-os.makedirs("SIMPLE/figuras", exist_ok=True)
+CARPETA_FIGURAS = os.path.join(os.path.dirname(__file__), "figuras")
+os.makedirs(CARPETA_FIGURAS, exist_ok=True)
 
 valores_n = [10, 20, 50]
 
@@ -26,14 +27,15 @@ ax_u.set_xlabel("x")
 ax_u.set_ylabel("u")
 ax_u.grid()
 ax_u.legend()
-fig_u.savefig("SIMPLE/figuras/u_numerica_vs_exacta.pdf")
+fig_u.savefig(os.path.join(CARPETA_FIGURAS, "u_numerica_vs_exacta.pdf"))
+
 
 ax_p.set_title('p numérica vs exacta')
 ax_p.set_xlabel("x")
 ax_p.set_ylabel("p")
 ax_p.grid()
 ax_p.legend()
-fig_p.savefig("SIMPLE/figuras/p_numerica_vs_exacta.pdf")
+fig_p.savefig(os.path.join(CARPETA_FIGURAS, "p_numerica_vs_exacta.pdf"))
 
 plt.show()
 

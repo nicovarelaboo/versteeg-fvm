@@ -1,5 +1,5 @@
 import numpy as np
-from fvm1d.malla import Malla
+from fvm.malla import Malla
 
 def coeficientes_difusion(malla: Malla, difusividad: float | np.ndarray) -> tuple[np.ndarray, np.ndarray]:
     # difusividad en las n+1 caras
@@ -19,7 +19,7 @@ def coeficientes_difusion(malla: Malla, difusividad: float | np.ndarray) -> tupl
     return aW, aE 
 
 if __name__ == "__main__":
-    from fvm1d.malla import crear_malla
+    from fvm.malla import crear_malla
 
     m = crear_malla(0.5, 5, 0.01)
     aW, aE = coeficientes_difusion(m, 1000.0)
