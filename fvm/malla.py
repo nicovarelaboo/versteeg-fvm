@@ -12,6 +12,7 @@ class Malla:
     delta_oeste: float
     delta_este: float
     area: np.ndarray
+    volumen_celdas: np.ndarray
 
 def crear_malla(L: float, n: int, area: float | np.ndarray) -> Malla:
     caras = np.linspace(0, L, n+1)
@@ -21,8 +22,9 @@ def crear_malla(L: float, n: int, area: float | np.ndarray) -> Malla:
     delta_este = caras[-1] - nodos[-1]
     delta_oeste = nodos[0] - caras[0]
     area = np.broadcast_to(area, n + 1)
+    volumen_celdas = (area[1:] + area[:-1]) / 2 * dx 
     return Malla(L=L, n=n, caras=caras, nodos=nodos, dx=dx, delta_nodos=delta_nodos,
-                 delta_oeste=delta_oeste, delta_este=delta_este, area=area)
+                 delta_oeste=delta_oeste, delta_este=delta_este, area=area, volumen_celdas=volumen_celdas)
 
 if __name__ == "__main__":
     m = crear_malla(0.5, 5, 1.0)

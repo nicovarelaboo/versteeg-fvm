@@ -4,15 +4,17 @@ from fvm.contornos import coeficientes_contorno, Contorno
 from fvm.difusion import coeficientes_difusion
 from fvm.resolvedores import tdma_coeficientes
 from fvm.malla import Malla 
+from fvm.fuentes import Fuente, integrar_fuentes
 
 
 def resolver_difusion(malla: Malla, difusividad: float | np.ndarray,
-                      oeste: Contorno, este: Contorno) -> np.ndarray:
+                      oeste: Contorno, este: Contorno, 
+                      fuentes: tuple[Fuente, ...] | list[Fuente] = ()) -> np.ndarray:
     
     """
     Resuelve la difusión estacionaria 1D de φ con volúmenes finitos.
 
-    Ecuación: d/dx(Γ dφ/dx) = 0, discretizada como
+    Ecuación: d/dx(Γ dφ/dx) + S = 0, discretizada como
     aP φP = aW φW + aE φE + Su.
 
     Parameters
@@ -23,6 +25,8 @@ def resolver_difusion(malla: Malla, difusividad: float | np.ndarray,
         Γ, un valor constante para todo el dominio o uno por cara (n+1 valores).
     oeste, este : Contorno
         Condiciones de contorno en x = 0 y x = L.
+    fuentes : tuple o list de Fuente (opcional)
+        Fuentes linealizadas; por defecto, ninguna.
 
     Returns
     -------
@@ -53,10 +57,15 @@ def resolver_difusion(malla: Malla, difusividad: float | np.ndarray,
     Sp[-1] += difusividad[-1] * malla.area[-1] * gamma_este
     Su[-1] += difusividad[-1] * malla.area[-1] * kappa_este
 
-    # 6. aP = aW + aE - Sp
+    # 6. sumar fuentes
+    Su_fuentes, Sp_fuentes = integrar_fuentes(malla=malla, fuentes=fuentes)
+    Sp += Sp_fuentes
+    Su += Su_fuentes
+
+    # 7. aP = aW + aE - Sp
     aP = aW + aE - Sp 
 
-    # 7. resolver con tdma_coeficientes y devolver phi
+    # 8. resolver con tdma_coeficientes y devolver phi
     phi = tdma_coeficientes(aW=aW, aP=aP, aE=aE, Su=Su)
 
     return phi
