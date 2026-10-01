@@ -3,6 +3,7 @@ import numpy as np
 from fvm.malla import crear_malla
 from fvm.ensamblado import resolver_difusion
 from fvm.contornos import Contorno
+from fvm.fuentes import Fuente
 
 def prueba_flujo_este():
 
@@ -43,9 +44,26 @@ def prueba_aislamiento_este():
 
     return np.allclose(phi, esperado)
 
+def prueba_generacion_uniforme():
+
+    m = crear_malla(L=0.02, n=5, area=1.0)
+
+    oeste = Contorno(tipo="dirichlet", valor=100.0)
+    este = Contorno(tipo="dirichlet", valor=200.0)
+
+    fuente = Fuente(constante=1000e3, lineal=0.0)
+
+    phi = resolver_difusion(malla=m, difusividad=0.5, oeste=oeste, este=este, fuentes=(fuente,))
+
+    esperado = [150, 218, 254, 258, 230]
+
+    return np.allclose(phi, esperado)
+
+
 
 if __name__ == "__main__":
     print(f"Prueba flujo este: {prueba_flujo_este()}")
     print(f"Prueba flujo oeste: {prueba_flujo_oeste()}")
     print(f"Prueba aislado este: {prueba_aislamiento_este()}")
+    print(f'Prueba generación uniforme: {prueba_generacion_uniforme()}')
 
