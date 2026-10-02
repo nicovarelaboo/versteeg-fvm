@@ -70,9 +70,10 @@ classDiagram
         +coeficientes_difusion(malla, difusividad) tuple
         +contornos_difusion(malla, difusividad, oeste, este) tuple
     }
-        class modulo_conveccion {
+    class modulo_conveccion {
         <<módulo conveccion.py>>
         +coeficientes_upwind(malla, flujo_masico) tuple
+        +contornos_upwind(malla, flujo_masico, oeste, este) tuple
     }
     class modulo_ensamblado {
         <<módulo ensamblado.py>>
@@ -91,7 +92,7 @@ classDiagram
         +prueba_generacion_uniforme() bool
         +prueba_aleta() bool
     }
-        class Fuente {
+    class Fuente {
         <<dataclass frozen>>
         +float|ndarray constante
         +float|ndarray lineal
@@ -110,6 +111,7 @@ classDiagram
     modulo_ensamblado ..> modulo_fuentes : llama
     modulo_ensamblado ..> modulo_difusion : llama
     modulo_difusion ..> modulo_contornos : llama
+    modulo_conveccion ..> modulo_contornos : llama
     modulo_ensamblado ..> modulo_resolvedores : llama
     modulo_pruebas ..> modulo_ensamblado : valida
 ```
@@ -162,4 +164,7 @@ flowchart TD
 - Constructores alternativos con @classmethod (p. ej. Malla.uniforme).
 - Empaquetar las contribuciones de los coeficientes aE, aW, Su, Sp en 
   su propia dataclass
+- Agrupar las propiedades del fluido (densidad, difusividad, viscosidad)
+  en una dataclass Propiedades; el flujo másico sigue aparte porque en
+  SIMPLE cambia en cada iteración.
 - Ensamblado con matriz dispersa (scipy.sparse), necesario en 2D.
