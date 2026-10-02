@@ -2,9 +2,31 @@ import numpy as np
 
 from fvm.malla import Malla
 
-def coeficientes_conveccion(malla: Malla, flujo_masico: float | np.ndarray
+def coeficientes_upwind(malla: Malla, flujo_masico: float | np.ndarray
                             ) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
+    """
+    Coeficientes convectivos con el esquema upwind en las caras interiores. 
+    Los contornos se tratan en contornos_upwind.
 
+    Parameters
+    ----------
+    malla : Malla
+        Malla 1D centrada en las celdas.
+    flujo_masico : float o np.ndarray
+        rho * u * A, escalar o un valor por cara (n+1)
+    
+    Returns
+    -------
+    aW_conv : np.ndarray
+        Contribución convectiva a aW en los n nodos; cero en el primero, 
+        cuya cara oeste es de contorno.
+    aE_conv : np.ndarray
+        Contribución convectiva a aE en los n nodos; cero en el último, 
+        cuya cara este es de contorno.
+    aP_conv : np.ndarray
+        F_e - F_w en cada celda: lo que la convección aporta a aP 
+        aparte de aW + aE.
+    """
     # flujo másico F en las n+1 caras (np.broadcast_to)
     F = np.broadcast_to(flujo_masico, malla.n+1)
 
@@ -32,7 +54,7 @@ if __name__ == "__main__":
 
     for i in ['positivo', 'negativo']:
         k = +1 if i == 'positivo' else -1
-        aW_conv, aE_conv, aP_conv = coeficientes_conveccion(malla=m, flujo_masico=k*np.array([1.0, 1.1, 1.0, 1.2, 0.9, 1.1]))
+        aW_conv, aE_conv, aP_conv = coeficientes_upwind(malla=m, flujo_masico=k*np.array([1.0, 1.1, 1.0, 1.2, 0.9, 1.1]))
         print(f'aW con flujo másico {i}: {aW_conv}')
         print(f'aE con flujo másico {i}: {aE_conv}')
         print(f'aP con flujo másico {i}: {aP_conv}')

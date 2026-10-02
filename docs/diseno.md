@@ -24,15 +24,18 @@ Todo se ejecuta como módulo desde la raíz, por ejemplo
   φ_b = α φ_P + β y (∂φ/∂n)_b = γ φ_P + κ, con n la normal saliente.
   El resto del código no necesita saber de qué tipo es el contorno.
 - Cada término trata sus propios contornos en su módulo (contornos_difusion,
-  contornos_conveccion) porque el tratamiento depende del esquema.
+  contornos_upwind) porque el tratamiento depende del esquema.
 - a_P se calcula al final, después de que todos los términos hayan
   aportado sus contribuciones.
 - Notación: mayúsculas para nodos (aP, aW, aE), minúsculas para caras.
 - Fuentes linealizadas por unidad de volumen, S = constante + lineal·φ,
   con lineal <= 0 (regla 3 de Patankar). Se integran con el volumen de
   cada celda, que guarda la malla.
+- Cada esquema convectivo tiene sus propias funciones de coeficientes y
+  de contornos (coeficientes_upwind, contornos_upwind). Cuando haya un
+  segundo esquema, se agruparán en una dataclass o una clase Esquema.
 
-## Diagrama de clases (pasos 1 y 2)
+## Diagrama de clases (pasos 1 a 3)
 
 ```mermaid
 classDiagram
@@ -67,6 +70,10 @@ classDiagram
         +coeficientes_difusion(malla, difusividad) tuple
         +contornos_difusion(malla, difusividad, oeste, este) tuple
     }
+        class modulo_conveccion {
+        <<módulo conveccion.py>>
+        +coeficientes_upwind(malla, flujo_masico) tuple
+    }
     class modulo_ensamblado {
         <<módulo ensamblado.py>>
         +resolver_difusion(malla, difusividad, oeste, este, fuentes) ndarray
@@ -97,6 +104,7 @@ classDiagram
     modulo_malla ..> Malla : crea
     modulo_contornos ..> Contorno : lee
     modulo_difusion ..> Malla : lee
+    modulo_conveccion ..> Malla : lee
     modulo_fuentes ..> Fuente : lee
     modulo_fuentes ..> Malla : lee
     modulo_ensamblado ..> modulo_fuentes : llama
