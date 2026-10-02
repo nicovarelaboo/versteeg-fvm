@@ -23,6 +23,8 @@ Todo se ejecuta como módulo desde la raíz, por ejemplo
 - Cada contorno se reduce a cuatro coeficientes lineales en φ_P:
   φ_b = α φ_P + β y (∂φ/∂n)_b = γ φ_P + κ, con n la normal saliente.
   El resto del código no necesita saber de qué tipo es el contorno.
+- Cada término trata sus propios contornos en su módulo (contornos_difusion,
+  contornos_conveccion) porque el tratamiento depende del esquema.
 - a_P se calcula al final, después de que todos los términos hayan
   aportado sus contribuciones.
 - Notación: mayúsculas para nodos (aP, aW, aE), minúsculas para caras.
@@ -63,6 +65,7 @@ classDiagram
     class modulo_difusion {
         <<módulo difusion.py>>
         +coeficientes_difusion(malla, difusividad) tuple
+        +contornos_difusion(malla, difusividad, oeste, este) tuple
     }
     class modulo_ensamblado {
         <<módulo ensamblado.py>>
@@ -98,7 +101,7 @@ classDiagram
     modulo_fuentes ..> Malla : lee
     modulo_ensamblado ..> modulo_fuentes : llama
     modulo_ensamblado ..> modulo_difusion : llama
-    modulo_ensamblado ..> modulo_contornos : llama
+    modulo_difusion ..> modulo_contornos : llama
     modulo_ensamblado ..> modulo_resolvedores : llama
     modulo_pruebas ..> modulo_ensamblado : valida
 ```
@@ -110,15 +113,12 @@ flowchart TD
     A(["Inicio"]) --> B["crear_malla(L, n, area)"]
     B --> C["Contorno oeste y Contorno este"]
     C --> D["coeficientes_difusion: aW, aE en caras interiores"]
-    D --> E["Su = 0, Sp = 0"]
-    E --> F["coeficientes_contorno(oeste, delta_oeste): γ, κ"]
-    F --> G["Sp[0] += Γ A γ ; Su[0] += Γ A κ"]
-    G --> H["coeficientes_contorno(este, delta_este): γ, κ"]
-    H --> I["Sp[-1] += Γ A γ ; Su[-1] += Γ A κ"]
-    I --> IF["integrar_fuentes: Su += Σ S_C ΔV ; Sp += Σ S_p ΔV"]
-    IF --> J["aP = aW + aE − Sp"]
-    J --> K["tdma_coeficientes(aW, aP, aE, Su)"]
-    K --> L(["φ"])
+    D --> E["contornos_difusion: Su_dif, Sp_dif"]
+    E --> F["integrar_fuentes: Su_fuentes, Sp_fuentes"]
+    F --> G["Su = Su_dif + Su_fuentes ; Sp = Sp_dif + Sp_fuentes"]
+    G --> H["aP = aW + aE − Sp"]
+    H --> I["tdma_coeficientes(aW, aP, aE, Su)"]
+    I --> J(["φ"])
 ```
 
 ## Ampliación prevista (pasos 2 a 5)
@@ -152,4 +152,6 @@ flowchart TD
   con el primer orden en un estudio de malla.
 - Prueba de convergencia del ejemplo 4.2 frente a la solución exacta.
 - Constructores alternativos con @classmethod (p. ej. Malla.uniforme).
+- Empaquetar las contribuciones de los coeficientes aE, aW, Su, Sp en 
+  su propia dataclass
 - Ensamblado con matriz dispersa (scipy.sparse), necesario en 2D.
