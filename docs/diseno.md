@@ -5,8 +5,8 @@ siguiendo la notación de Versteeg y Malalasekera.
 
 ## Estructura del repositorio
 
-- `fvm/`: paquete reutilizable (malla, contornos, difusión, fuentes, ensamblado
-  y resolvedores).
+- `fvm/`: paquete reutilizable (malla, contornos, difusión, convección, fuentes,
+  ensamblado y resolvedores).
 - `ejemplos/`: ejemplos del libro, organizados por tema (`difusion`,
   `conveccion`, `SIMPLE`, `transitorio`). Los más antiguos aún no usan
   el paquete y se irán migrando.
@@ -27,6 +27,9 @@ Todo se ejecuta como módulo desde la raíz, por ejemplo
   contornos_upwind) porque el tratamiento depende del esquema.
 - a_P se calcula al final, después de que todos los términos hayan
   aportado sus contribuciones.
+- Cada término puede aportar a a_P una parte que no se reduce a aW + aE
+  (p. ej. aP_conv = F_e − F_w en convección) y la devuelve por separado;
+  el ensamblado la suma junto con las demás.
 - Notación: mayúsculas para nodos (aP, aW, aE), minúsculas para caras.
 - Fuentes linealizadas por unidad de volumen, S = constante + lineal·φ,
   con lineal <= 0 (regla 3 de Patankar). Se integran con el volumen de
@@ -134,13 +137,14 @@ flowchart TD
 ## Ampliación prevista (pasos 2 a 5)
 
 Cada término físico aporta su contribución a los mismos arrays y el
-ensamblado solo las suma. Las cajas discontinuas aún no existen.
+ensamblado solo las suma. Las cajas discontinuas aún no están
+conectadas al ensamblado.
 
 ```mermaid
 flowchart TD
     M["Malla, contornos y propiedades"] --> T1["Difusión: aW, aE, Su, Sp"]
     M --> T2["Fuentes (paso 2): Su, Sp"]
-    M --> T3["Convección (paso 3): aW, aE, Su, Sp"]
+    M --> T3["Convección (paso 3): aW, aE, aP_conv, Su, Sp"]
     M --> T4["Corrección diferida QUICK (paso 4): Su"]
     M --> T5["Transitorio (paso 5): aP0, Su"]
     T1 --> S["Sumar contribuciones"]
@@ -168,3 +172,4 @@ flowchart TD
   en una dataclass Propiedades; el flujo másico sigue aparte porque en
   SIMPLE cambia en cada iteración.
 - Ensamblado con matriz dispersa (scipy.sparse), necesario en 2D.
+
