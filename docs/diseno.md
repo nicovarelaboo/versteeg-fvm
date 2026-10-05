@@ -5,8 +5,8 @@ siguiendo la notación de Versteeg y Malalasekera.
 
 ## Estructura del repositorio
 
-- `fvm/`: paquete reutilizable (malla, contornos, difusión, convección, fuentes,
-  ensamblado y resolvedores).
+- `fvm/`: paquete reutilizable (malla, contornos, contribuciones, difusión,
+  convección, fuentes, ensamblado y resolvedores).
 - `ejemplos/`: ejemplos del libro, organizados por tema (`difusion`,
   `conveccion`, `SIMPLE`, `transitorio`). Los más antiguos aún no usan
   el paquete y se irán migrando.
@@ -30,6 +30,11 @@ Todo se ejecuta como módulo desde la raíz, por ejemplo
 - Cada término puede aportar a a_P una parte que no se reduce a aW + aE
   (p. ej. aP_conv = F_e − F_w en convección) y la devuelve por separado;
   el ensamblado la suma junto con las demás.
+- Cada término devuelve sus coeficientes en una dataclass Contribucion
+  (aW, aE, Su, Sp, aP_extra), definida en contribuciones.py para que
+  ni los términos ni el ensamblado dependan entre sí. Su y Sp tienen
+  unidades de coeficiente: las fuentes por unidad de volumen van ya
+  multiplicadas por el volumen de la celda.
 - Notación: mayúsculas para nodos (aP, aW, aE), minúsculas para caras.
 - Fuentes linealizadas por unidad de volumen, S = constante + lineal·φ,
   con lineal <= 0 (regla 3 de Patankar). Se integran con el volumen de
@@ -59,6 +64,14 @@ classDiagram
         <<dataclass frozen>>
         +str tipo
         +float valor
+    }
+    class Contribucion {
+        <<dataclass frozen>>
+        +ndarray aW
+        +ndarray aE
+        +ndarray Su
+        +ndarray Sp
+        +ndarray aP_extra
     }
     class modulo_malla {
         <<módulo malla.py>>
@@ -166,8 +179,6 @@ flowchart TD
   con el primer orden en un estudio de malla.
 - Prueba de convergencia del ejemplo 4.2 frente a la solución exacta.
 - Constructores alternativos con @classmethod (p. ej. Malla.uniforme).
-- Empaquetar las contribuciones de los coeficientes aE, aW, Su, Sp en 
-  su propia dataclass
 - Agrupar las propiedades del fluido (densidad, difusividad, viscosidad)
   en una dataclass Propiedades; el flujo másico sigue aparte porque en
   SIMPLE cambia en cada iteración.
