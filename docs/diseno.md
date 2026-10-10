@@ -173,6 +173,12 @@ flowchart TD
     class T3,T4,T5 futuro
 ```
 
+## Cambios pequeños pendientes
+
+- Anotar las entradas que aceptan escalar o array con
+  numpy.typing.ArrayLike en vez de float | np.ndarray, en todo
+  el paquete.
+
 ## Ideas pendientes
 
 - Contornos de segundo orden (gradiente con tres puntos), comparando
