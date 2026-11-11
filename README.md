@@ -58,10 +58,11 @@ Requiere Python 3 con numpy y matplotlib. Desde la raíz del repositorio:
     python -m tests.test_difusion
     python -m docs.generar_figuras
 
-## Estado
+## Próximos pasos
 
-En desarrollo. En la rama `feat/fvm-conveccion` estoy reorganizando el
-paquete para que cada término (difusión, convección, fuentes) aporte su
-contribución a la ecuación discreta de forma independiente. Después
-quiero migrar los ejemplos antiguos al paquete, añadir QUICK y el término
-transitorio, y extenderlo a 2D con matrices dispersas.
+- Reorganizar el paquete para que cada término (difusión, convección,
+  fuentes) aporte su contribución a la ecuación discreta de forma
+  independiente (rama `feat/fvm-conveccion`).
+- Migrar los ejemplos antiguos al paquete y añadir QUICK y el término
+  transitorio.
+- Extender el paquete a 2D.
