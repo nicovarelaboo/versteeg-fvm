@@ -89,6 +89,6 @@ print(T)   # temperatura en los centros de las 10 celdas
 - Reorganizar el paquete para que cada término (difusión, convección,
   fuentes) aporte su contribución a la ecuación discreta de forma
   independiente (rama `feat/fvm-conveccion`).
-- Migrar los ejemplos antiguos al paquete y añadir QUICK y el término
+- Migrar los ejemplos antiguos al paquete e incorporar a él QUICK y el término
   transitorio.
 - Extender el paquete a 2D.
