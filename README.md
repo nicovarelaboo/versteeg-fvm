@@ -51,10 +51,36 @@ relajación, el algoritmo diverge.
 
 ## Uso
 
-Requiere Python 3 con numpy y matplotlib. Desde la raíz del repositorio:
+Requiere Python 3 con numpy y matplotlib. Los comandos se ejecutan desde
+la raíz del repositorio.
+
+### Resolver un problema con el paquete
+
+Aleta de longitud 1 con el extremo izquierdo a 100 °C, el derecho aislado
+y pérdida de calor al ambiente, modelada como una fuente linealizada
+S = 500 − 25 T:
+
+```python
+from fvm.malla import crear_malla
+from fvm.contornos import Contorno
+from fvm.fuentes import Fuente
+from fvm.ensamblado import resolver_difusion
+
+malla = crear_malla(L=1.0, n=10, area=1.0)
+
+T = resolver_difusion(
+    malla=malla,
+    difusividad=1.0,
+    oeste=Contorno("dirichlet", 100.0),
+    este=Contorno("neumann", 0.0),
+    fuentes=[Fuente(constante=500.0, lineal=-25.0)],
+)
+print(T)   # temperatura en los centros de las 10 celdas
+```
+
+### Ejecutar los ejemplos, las pruebas y las figuras
 
     python -m ejemplos.SIMPLE.tobera1D
-    python -m ejemplos.difusion.ejemplo42
     python -m tests.test_difusion
     python -m docs.generar_figuras
 
